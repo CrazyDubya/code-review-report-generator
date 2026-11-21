@@ -383,6 +383,22 @@ class ReportGenerator:
     
     def generate_full_report(self, metrics: Dict) -> str:
         """Generate complete code review report"""
+        if metrics.get('code_files', 0) == 0:
+            return "\n".join([
+                f"# Code review: {self.repo_name}",
+                f"**Review Date**: {self.review_date}",
+                f"**Branch**: {self.branch_name}",
+                "",
+                "## No supported code files found",
+                "",
+                f"Scanned {metrics.get('total_files', 0)} files. No supported code files were found after exclusions.",
+                "Code files: 0. Lines of code: 0. Classes: 0. Functions: 0.",
+                "Code quality, documentation quality, and repository health were not assessed.",
+                "Check the repository path, supported file types, and excluded directories before requesting a code review.",
+                "",
+                self.generate_file_type_distribution(metrics),
+                "",
+            ])
         report_parts = [
             f"# 🔍 COMPREHENSIVE CODE REVIEW: {self.repo_name}",
             f"**Review Date**: {self.review_date}",

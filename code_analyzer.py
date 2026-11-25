@@ -50,7 +50,15 @@ class CodeAnalyzer:
         
     def should_exclude(self, path: Path) -> bool:
         """Check if path should be excluded"""
-        parts = path.parts
+        # Exclusions belong to the selected repository, not its host path.
+        # An ancestor (or the selected root itself) may legitimately be named
+        # build, lib, node_modules, etc.
+        try:
+            parts = path.relative_to(self.root_path).parts
+        except ValueError:
+            # Public callers historically received a boolean for arbitrary
+            # paths, including those outside the selected repository.
+            parts = path.parts
         return any(excluded in parts for excluded in self.exclude_dirs)
     
     def analyze_python_file(self, file_path: Path) -> FileMetrics:

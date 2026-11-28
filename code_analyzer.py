@@ -90,7 +90,10 @@ class CodeAnalyzer:
                     imports.append(match.group(1).split('.')[0])
                 else:  # import X
                     for imp in match.group(2).split(','):
-                        imports.append(imp.strip().split('.')[0])
+                        # Drop an "as alias" so "import numpy as np" counts as numpy.
+                        name = imp.strip().split()[0] if imp.strip() else ''
+                        if name:
+                            imports.append(name.split('.')[0])
         
         # Count TODOs and FIXMEs (only in actual action comments, not descriptions)
         todos = sum(1 for line in lines if line.strip().startswith('#') and 'TODO:' in line.upper() or (line.strip().startswith('#') and 'TODO' in line.upper() and 'COUNT' not in line.upper() and 'FIXME' not in line.upper()))
